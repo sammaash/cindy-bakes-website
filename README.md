@@ -1,6 +1,6 @@
 # Cindy Bakes Delights website
 
-React/Vite frontend for Cindy Bakes Delights. The chatbot backend is deployed separately.
+React/Vite frontend and Flask chatbot backend for Cindy Bakes Delights. Vercel and Railway deploy the same repository as separate services.
 
 ## Local development
 
@@ -20,6 +20,16 @@ Set `VITE_CAKE_BOT_URL` in `.env.local` to the local bot URL, for example `http:
 5. Deploy after the backend is available.
 
 No secret belongs in `VITE_*` variables; Vite exposes them to browser code.
+
+## Railway backend
+
+Railway must use the root `Procfile` or `railway.toml` and start:
+
+```text
+gunicorn --bind 0.0.0.0:$PORT "whatsapp_webhook:create_app()"
+```
+
+The Flask service exposes `GET /health`, `POST /api/chat`, and the existing WhatsApp `/webhook` routes. Attach a Volume at `/data` and set `DATABASE_PATH=/data/cindy_bakes.db` for persistent SQLite storage. Backend secrets belong only in Railway variables.
 
 Currently, two official plugins are available:
 
