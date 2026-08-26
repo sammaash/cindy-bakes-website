@@ -1,0 +1,17 @@
+{
+  "name": "Cindy Bakes Delights",
+  "short_name": "Cindy Bakes",
+  "description": "Custom-made cakes and celebration bakes for every occasion.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffaf7",
+  "theme_color": "#f5dacc",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

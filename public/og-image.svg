@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Cindy Bakes Delights">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f6e5dc"/>
+      <stop offset="100%" stop-color="#edc1a6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#fffaf7"/>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#bg)" opacity="0.65"/>
+  <circle cx="660" cy="330" r="180" fill="#f8ded0"/>
+  <circle cx="645" cy="340" r="150" fill="#f5c2a1"/>
+  <circle cx="620" cy="330" r="105" fill="#f7efe9"/>
+  <path d="M520 340c0-62 47-110 103-110 68 0 119 52 119 125 0 72-58 130-129 130-76 0-130-58-130-144 0-33 9-62 27-89l55 31c-8 17-14 36-14 58 0 41 29 69 65 69 43 0 69-35 69-79 0-44-35-79-77-79-29 0-54 18-64 45l-51-28c19-42 69-70 124-70 87 0 155 69 155 157 0 103-77 176-181 176-105 0-185-74-185-179 0-58 26-111 68-147l46 69c-27 17-44 48-44 82z" fill="#fff" opacity="0.9"/>
+  <text x="120" y="200" fill="#3d271f" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="700">Cindy Bakes Delights</text>
+  <text x="120" y="290" fill="#6a453d" font-family="Arial, Helvetica, sans-serif" font-size="34">Custom-made cakes for every occasion</text>
+  <text x="120" y="352" fill="#6a453d" font-family="Arial, Helvetica, sans-serif" font-size="34">Fresh, delicious &amp; baked with love</text>
+  <text x="120" y="500" fill="#854b39" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700">WhatsApp • Instagram • TikTok</text>
+</svg>
