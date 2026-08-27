@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "gunicorn --bind 0.0.0.0:$PORT 'whatsapp_webhook:create_app()'"
+startCommand = "/opt/venv/bin/gunicorn --bind 0.0.0.0:$PORT 'whatsapp_webhook:create_app()'"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
