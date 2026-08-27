@@ -1,6 +1,5 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm run build && pip install -r requirements.txt"
 
 [deploy]
 startCommand = "gunicorn --bind 0.0.0.0:$PORT 'whatsapp_webhook:create_app()'"
