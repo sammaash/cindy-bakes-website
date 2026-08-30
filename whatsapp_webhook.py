@@ -13,6 +13,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from dotenv import load_dotenv
 
 from agent import CindyBakesAgent
+from admin_routes import create_admin_blueprint
 from notifications import WhatsAppCloudNotifier, WhatsAppUnavailableSender
 from whatsapp_agent_service import WhatsAppAgentService
 from whatsapp_database import claim_event
@@ -23,6 +24,9 @@ logger = logging.getLogger(__name__)
 def create_app(service: WhatsAppAgentService | None = None) -> Flask:
     load_dotenv()
     app = Flask(__name__)
+    # The dashboard blueprint is unavailable until its two Railway variables are set.
+    app.config["SECRET_KEY"] = os.getenv("DASHBOARD_SECRET_KEY") or os.urandom(32)
+    app.register_blueprint(create_admin_blueprint())
     app.config["WHATSAPP_VERIFY_TOKEN"] = os.getenv("WHATSAPP_VERIFY_TOKEN", "")
     app.config["WHATSAPP_APP_SECRET"] = os.getenv("WHATSAPP_APP_SECRET", "")
     allowed_origins = {

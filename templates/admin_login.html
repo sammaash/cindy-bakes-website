@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff sign in | Cindy Bakes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+  <main class="shell narrow">
+    <section class="panel">
+      <p class="eyebrow">Cindy Bakes</p>
+      <h1>Order desk</h1>
+      <p class="disclaimer">Sign in to view and manage customer orders.</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+      <form method="post" class="verify-panel">
+        <label>Password <input name="password" type="password" autocomplete="current-password" required autofocus></label>
+        <button type="submit">Sign in</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

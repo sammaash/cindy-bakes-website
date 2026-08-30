@@ -31,6 +31,10 @@ gunicorn --bind 0.0.0.0:$PORT "whatsapp_webhook:create_app()"
 
 The Flask service exposes `GET /health`, `POST /api/chat`, and the existing WhatsApp `/webhook` routes. Attach a Volume at `/data` and set `DATABASE_PATH=/data/cindy_bakes.db` for persistent SQLite storage. Backend secrets belong only in Railway variables.
 
+### Staff order dashboard
+
+Set `DASHBOARD_PASSWORD` and a long random `DASHBOARD_SECRET_KEY` as Railway variables, then visit `/admin/login` on the Railway domain. The dashboard is unavailable until both values are set. Do not use either variable as a `VITE_*` value.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
