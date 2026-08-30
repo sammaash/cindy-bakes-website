@@ -26,6 +26,11 @@ def create_app(service: WhatsAppAgentService | None = None) -> Flask:
     app = Flask(__name__)
     # The dashboard blueprint is unavailable until its two Railway variables are set.
     app.config["SECRET_KEY"] = os.getenv("DASHBOARD_SECRET_KEY") or os.urandom(32)
+    app.config.update(
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
+        SESSION_COOKIE_SECURE=True,
+    )
     app.register_blueprint(create_admin_blueprint())
     app.config["WHATSAPP_VERIFY_TOKEN"] = os.getenv("WHATSAPP_VERIFY_TOKEN", "")
     app.config["WHATSAPP_APP_SECRET"] = os.getenv("WHATSAPP_APP_SECRET", "")

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { catalog, galleryItems, getWhatsAppUrl, socialSlides } from './data/catalog'
 
@@ -40,6 +40,9 @@ function App() {
   ])
   const [chatLoading, setChatLoading] = useState(false)
   const [chatSessionId, setChatSessionId] = useState('')
+  const chatMessagesRef = useRef(null)
+  const shouldAutoScrollRef = useRef(true)
+  const forceChatScrollRef = useRef(false)
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -48,6 +51,20 @@ function App() {
 
     return () => window.clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    const messages = chatMessagesRef.current
+    if (!chatOpen || !messages || (!shouldAutoScrollRef.current && !forceChatScrollRef.current)) return
+
+    messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' })
+    shouldAutoScrollRef.current = true
+    forceChatScrollRef.current = false
+  }, [chatMessages, chatLoading, chatOpen])
+
+  const handleChatScroll = (event) => {
+    const { scrollHeight, scrollTop, clientHeight } = event.currentTarget
+    shouldAutoScrollRef.current = scrollHeight - scrollTop - clientHeight < 80
+  }
 
   const nextSlide = () => {
     setActiveSlide((current) => (current + 1) % socialSlides.length)
@@ -62,6 +79,7 @@ function App() {
     const message = chatMessage.trim()
     if (!message || chatLoading) return
 
+    forceChatScrollRef.current = true
     setChatMessages((current) => [...current, { role: 'user', text: message }])
     setChatMessage('')
     setChatLoading(true)
@@ -472,7 +490,12 @@ function App() {
                 ×
               </button>
             </div>
-            <div className="chat-messages" aria-live="polite">
+            <div
+              ref={chatMessagesRef}
+              className="chat-messages"
+              aria-live="polite"
+              onScroll={handleChatScroll}
+            >
               {chatMessages.map((item, index) => (
                 <p key={`${item.role}-${index}`} className={`chat-message ${item.role}`}>
                   {item.text}
