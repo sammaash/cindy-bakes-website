@@ -254,8 +254,8 @@ function App() {
             <ul className="pricing-notes">
               <li>The prices are in KSH.</li>
               <li>Kindly DM for prices of any flavors that are not in the list that you may be interested in.</li>
-              <li>Toppers, edible prints and personalised designs incur an extra 350.</li>
-              <li>Deposit of at least 50% is required to book your order.</li>
+              <li>Edible prints cost KSh 1,000; non-edible toppers cost KSh 500.</li>
+              <li>A 70% deposit is required to book your order.</li>
               <li>Order window is 3 days.</li>
               <li>Delivery cost applies depending on your location.</li>
             </ul>

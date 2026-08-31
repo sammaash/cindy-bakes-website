@@ -2,7 +2,7 @@
 
 PERSONALISATION_PRICES = {
     "none": 0,
-    "non_edible_topper": 300,
+    "non_edible_topper": 500,
     "edible_print": 1000,
 }
 REQUIRED_DEPOSIT_RATE = 0.70
@@ -14,7 +14,7 @@ DELIVERY_ORIGIN = "Dainty Haven, JWCQ+MW8, Beijing Road, Mlolongo, Kenya"
 BUSINESS_RULES = {
     "custom_flavours": "Custom flavours require the customer to contact Cindy Bakes for pricing.",
     "personalisation": (
-        "No personalisation is free. A non-edible topper costs KSh 300 per cake, "
+        "No personalisation is free. A non-edible topper costs KSh 500 per cake, "
         "and an edible print costs KSh 1,000 per cake."
     ),
     "deposit": "A 70% deposit is required to confirm an order and must be paid at least 3 days before the delivery or pickup date.",
