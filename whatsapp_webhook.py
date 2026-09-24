@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 
 from agent import CindyBakesAgent
 from admin_routes import create_admin_blueprint
+from invoice_delivery import generate_and_send_invoice
 from notifications import WhatsAppCloudNotifier, WhatsAppUnavailableSender
 from whatsapp_agent_service import WhatsAppAgentService
 from whatsapp_database import claim_event
@@ -75,7 +76,11 @@ def create_app(service: WhatsAppAgentService | None = None) -> Flask:
             if agent is None:
                 agent = CindyBakesAgent()
                 browser_sessions[session_id] = agent
-            return jsonify({"reply": agent.respond(message), "session_id": session_id})
+            reply = agent.respond(message)
+            order_id = agent.pop_confirmed_order_id()
+            if order_id is not None:
+                generate_and_send_invoice(order_id, service.sender, service.database_path)
+            return jsonify({"reply": reply, "session_id": session_id})
         except Exception:
             app.logger.exception("Browser chat request failed")
             return jsonify({"error": "The chat assistant is temporarily unavailable."}), 503

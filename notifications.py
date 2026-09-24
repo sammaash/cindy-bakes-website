@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 from typing import Protocol
 
 import requests
@@ -38,6 +39,12 @@ class WhatsAppUnavailableSender:
     configured = False
 
     def send_text(self, recipient: str, message: str) -> None:
+        raise RuntimeError(
+            "WhatsApp Cloud API sending is unavailable. Configure WHATSAPP_ACCESS_TOKEN "
+            "and WHATSAPP_PHONE_NUMBER_ID."
+        )
+
+    def send_document(self, recipient: str, file_path: str, filename: str, caption: str) -> None:
         raise RuntimeError(
             "WhatsApp Cloud API sending is unavailable. Configure WHATSAPP_ACCESS_TOKEN "
             "and WHATSAPP_PHONE_NUMBER_ID."
@@ -79,6 +86,37 @@ class WhatsAppCloudNotifier:
         )
         logger.info("WhatsApp API response status=%s", response.status_code)
         response.raise_for_status()
+
+    def send_document(self, recipient: str, file_path: str, filename: str, caption: str) -> None:
+        """Upload a document to the Cloud API media endpoint, then send it as a message."""
+        media_id = self._upload_media(file_path)
+        logger.info("WhatsApp document send started recipient=%s filename=%s", recipient, filename)
+        response = requests.post(
+            self.url,
+            headers={"Authorization": f"Bearer {self.access_token}"},
+            json={
+                "messaging_product": "whatsapp",
+                "to": recipient,
+                "type": "document",
+                "document": {"id": media_id, "filename": filename, "caption": caption},
+            },
+            timeout=20,
+        )
+        logger.info("WhatsApp document API response status=%s", response.status_code)
+        response.raise_for_status()
+
+    def _upload_media(self, file_path: str) -> str:
+        media_url = self.url.replace("/messages", "/media")
+        with open(file_path, "rb") as file_object:
+            response = requests.post(
+                media_url,
+                headers={"Authorization": f"Bearer {self.access_token}"},
+                data={"messaging_product": "whatsapp", "type": "application/pdf"},
+                files={"file": (Path(file_path).name, file_object, "application/pdf")},
+                timeout=30,
+            )
+        response.raise_for_status()
+        return response.json()["id"]
 
     def send_payment_reminder(self, order: dict) -> None:
         self._send(

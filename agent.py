@@ -84,6 +84,7 @@ class CindyBakesAgent:
         self.draft = OrderDraft()
         self.input_items = []
         self.whatsapp_wa_id = whatsapp_wa_id
+        self.last_confirmed_order_id: int | None = None
 
     def restore_state(self, draft: dict | None, input_items: list | None) -> None:
         """Restore a WhatsApp conversation without changing terminal behavior."""
@@ -164,7 +165,9 @@ class CindyBakesAgent:
                 quote["delivery_status"] = "manual_confirmation_required"
                 draft = self.draft.as_dict()
                 draft["whatsapp_wa_id"] = self.whatsapp_wa_id
-                return create_pending_order(draft, quote)
+                order = create_pending_order(draft, quote)
+                self.last_confirmed_order_id = order.get("id")
+                return order
             except (ValueError, RuntimeError) as error:
                 return {"error": str(error)}
         if name == "get_payment_status":
@@ -172,8 +175,15 @@ class CindyBakesAgent:
             return status or {"error": "Order not found."}
         return {"error": "Unknown tool."}
 
+    def pop_confirmed_order_id(self) -> int | None:
+        """Return and clear an order id confirmed during the most recent respond() call."""
+        order_id = self.last_confirmed_order_id
+        self.last_confirmed_order_id = None
+        return order_id
+
     def respond(self, customer_message: str) -> str:
         """Process one customer message and return the natural-language reply."""
+        self.last_confirmed_order_id = None
         self.input_items.append({"role": "user", "content": customer_message})
         for _ in range(6):
             response = self.client.responses.create(

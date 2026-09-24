@@ -65,6 +65,11 @@ def _connect(database_path: str | Path = DEFAULT_DATABASE_PATH):
         "delivery_rate_per_km": "REAL",
         "delivery_cost": "REAL",
         "whatsapp_wa_id": "TEXT",
+        "invoice_number": "TEXT",
+        "invoice_path": "TEXT",
+        "invoice_status": "TEXT",
+        "whatsapp_delivery_status": "TEXT",
+        "invoice_created_at": "TEXT",
     }.items():
         if column_name not in columns:
             connection.execute(f"ALTER TABLE orders ADD COLUMN {column_name} {column_type}")
@@ -180,6 +185,28 @@ def update_delivery_cost(order_id: int, delivery_cost: float | int,
             (amount, _now(), order_id),
         )
     return get_order(order_id, database_path)
+
+
+def save_invoice(order_id: int, invoice_number: str, invoice_path: str,
+                 database_path: str | Path = DEFAULT_DATABASE_PATH) -> None:
+    """Record a generated invoice against its order."""
+    with _connect(database_path) as connection:
+        connection.execute(
+            """UPDATE orders
+               SET invoice_number = ?, invoice_path = ?, invoice_status = 'GENERATED', invoice_created_at = ?
+               WHERE id = ?""",
+            (invoice_number, invoice_path, _now(), order_id),
+        )
+
+
+def update_whatsapp_delivery_status(order_id: int, status: str,
+                                    database_path: str | Path = DEFAULT_DATABASE_PATH) -> None:
+    """Record whether the invoice PDF was delivered over WhatsApp."""
+    with _connect(database_path) as connection:
+        connection.execute(
+            "UPDATE orders SET whatsapp_delivery_status = ?, updated_at = ? WHERE id = ?",
+            (status, _now(), order_id),
+        )
 
 
 def get_payment_status(order_id: int, database_path: str | Path = DEFAULT_DATABASE_PATH) -> dict | None:
