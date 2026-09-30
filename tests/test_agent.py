@@ -9,6 +9,11 @@ os.environ.setdefault("OPENAI_API_KEY", "test-key-not-a-real-secret")
 from agent import CindyBakesAgent, _strip_output_only_fields
 
 
+# Maps Python-keyword-safe attribute names to the real API field names, mirroring
+# how pydantic's by_alias=True dump behaves for fields like "async_" -> "async".
+_ALIASES = {"async_": "async"}
+
+
 class FakeOutputItem:
     """Stand-in for an SDK response.output item (has model_dump, like the real ones)."""
 
@@ -16,8 +21,10 @@ class FakeOutputItem:
         self._data = data
         self.type = data.get("type")
 
-    def model_dump(self, mode="json"):
-        return dict(self._data)
+    def model_dump(self, mode="json", by_alias=False):
+        if not by_alias:
+            return dict(self._data)
+        return {_ALIASES.get(key, key): value for key, value in self._data.items()}
 
 
 class StripOutputOnlyFieldsTests(unittest.TestCase):
@@ -38,6 +45,16 @@ class StripOutputOnlyFieldsTests(unittest.TestCase):
 
         self.assertNotIn("status", result)
         self.assertNotIn("id", result)
+
+    def test_uses_api_field_name_not_python_alias(self):
+        # Regression for: Unknown parameter: 'input[6].async_'. Did you mean 'async'?
+        item = FakeOutputItem({
+            "id": "fc_123", "type": "function_call", "status": "completed", "async_": True,
+        })
+        result = _strip_output_only_fields(item)
+
+        self.assertNotIn("async_", result)
+        self.assertEqual(result["async"], True)
 
 
 class RestoreStateSanitizesHistoryTests(unittest.TestCase):

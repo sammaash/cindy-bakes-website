@@ -77,8 +77,10 @@ def _strip_output_only_fields(item) -> dict:
 
     "status" and "id" are only valid on API *output* items; the Responses API
     rejects them when the same item is replayed inside a later input array.
+    by_alias=True is required so Python-keyword-safe field names (e.g. "async_")
+    are dumped using the API's actual field name (e.g. "async"), not the Python one.
     """
-    data = item.model_dump(mode="json") if hasattr(item, "model_dump") else dict(item)
+    data = item.model_dump(mode="json", by_alias=True) if hasattr(item, "model_dump") else dict(item)
     data.pop("status", None)
     data.pop("id", None)
     return data
@@ -108,10 +110,7 @@ class CindyBakesAgent:
 
     def export_state(self) -> tuple[dict, list]:
         """Return serializable draft and response input state."""
-        serialized_items = [
-            item.model_dump(mode="json") if hasattr(item, "model_dump") else item
-            for item in self.input_items
-        ]
+        serialized_items = [_strip_output_only_fields(item) for item in self.input_items]
         return self.draft.as_dict(), serialized_items
 
     def _run_tool(self, name: str, arguments: dict) -> dict:
