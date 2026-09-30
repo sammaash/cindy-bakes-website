@@ -72,6 +72,18 @@ TOOLS = [
 ]
 
 
+def _strip_output_only_fields(item) -> dict:
+    """Convert a response.output item (or restored dict) into a valid input item.
+
+    "status" and "id" are only valid on API *output* items; the Responses API
+    rejects them when the same item is replayed inside a later input array.
+    """
+    data = item.model_dump(mode="json") if hasattr(item, "model_dump") else dict(item)
+    data.pop("status", None)
+    data.pop("id", None)
+    return data
+
+
 class CindyBakesAgent:
     """Keeps LLM message history and order state for one CLI session."""
 
@@ -90,7 +102,9 @@ class CindyBakesAgent:
         """Restore a WhatsApp conversation without changing terminal behavior."""
         if draft:
             self.draft.update(**{key: value for key, value in draft.items() if hasattr(self.draft, key)})
-        self.input_items = input_items or []
+        # Drop output-only fields from any items saved before this was fixed, so old
+        # conversations self-heal instead of failing responses.create() with e.g. "status".
+        self.input_items = [_strip_output_only_fields(item) for item in (input_items or [])]
 
     def export_state(self) -> tuple[dict, list]:
         """Return serializable draft and response input state."""
@@ -192,7 +206,7 @@ class CindyBakesAgent:
                 input=self.input_items,
                 tools=TOOLS,
             )
-            self.input_items.extend(response.output)
+            self.input_items.extend(_strip_output_only_fields(item) for item in response.output)
             tool_calls = [item for item in response.output if item.type == "function_call"]
             if not tool_calls:
                 return response.output_text or "I’m sorry, I couldn’t prepare a response. Please try again."
