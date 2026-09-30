@@ -73,6 +73,10 @@ class OrderDraft:
 
     def update(self, **fields) -> dict:
         for name, value in fields.items():
+            # "missing_fields" is derived (see as_dict/missing_fields below); never let it
+            # overwrite the missing_fields() method when replaying a saved draft dict.
+            if name == "missing_fields":
+                continue
             if value is not None and hasattr(self, name):
                 setattr(self, name, value)
         if self.flavour:
