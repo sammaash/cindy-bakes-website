@@ -81,6 +81,10 @@ def _strip_output_only_fields(item) -> dict:
     are dumped using the API's actual field name (e.g. "async"), not the Python one.
     """
     data = item.model_dump(mode="json", by_alias=True) if hasattr(item, "model_dump") else dict(item)
+    # Self-heal conversations saved before by_alias=True existed, where a plain
+    # dict was persisted with the Python attribute name instead of the API's.
+    if "async_" in data:
+        data["async"] = data.pop("async_")
     data.pop("status", None)
     data.pop("id", None)
     return data

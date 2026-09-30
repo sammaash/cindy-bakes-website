@@ -56,6 +56,15 @@ class StripOutputOnlyFieldsTests(unittest.TestCase):
         self.assertNotIn("async_", result)
         self.assertEqual(result["async"], True)
 
+    def test_renames_already_persisted_async_key_on_plain_dict(self):
+        # Regression for conversations saved before by_alias=True existed: a plain
+        # dict already stored with the bad key must self-heal on restore, too.
+        item = {"id": "fc_456", "type": "function_call", "status": "completed", "async_": True}
+        result = _strip_output_only_fields(item)
+
+        self.assertNotIn("async_", result)
+        self.assertEqual(result["async"], True)
+
 
 class RestoreStateSanitizesHistoryTests(unittest.TestCase):
     def test_restore_state_strips_status_from_saved_history(self):
